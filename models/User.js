@@ -14,11 +14,12 @@ const userSchema = new Schema(
       type: String,
       unique: true,
       required: true,
-      validate: [validateEmail, "Please fill a valid email address"],
-      match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        "Please fill a valid email address",
-      ],
+      validate: {
+        validator: function (value) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        },
+        message: "Invalid email address format",
+      },
     },
     thoughts: [
       {
@@ -45,7 +46,6 @@ userSchema.virtual("friendCount").get(function () {
   return this.friends.length;
 });
 
-// Initialize our Post model
 const User = model("user", userSchema);
 
 module.exports = User;
