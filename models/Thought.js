@@ -1,10 +1,35 @@
-const departmentSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    // This will add a single subdocument to include the manager's information
-    manager: managerSchema,
-    // This will include an array that holds all the employees' information
-    employees: [employeeSchema], // use this syntax
-    lastAccessed: { type: Date, default: Date.now },
-  });
+const { Schema, model } = require("mongoose");
 
-  // relate to the reaction schema
+
+const thoughtSchema = new Schema(
+  {
+    thoughtText: {
+      type: String,
+      required: true,
+      minLength: 1,
+      maxLength: 280,
+      description: "Must be between 1 and 280 characters",
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    username: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
+    reactions: [reactionSchema],
+    toJSON: {
+      virtuals: true,
+    },
+    id: false,
+  }
+);
+thoughtSchema.virtual("reactionCount").get(function () {
+  return this.reactions.length;
+});
+
+// Initialize our Post model
+const Thought = model("thought", thoughtSchema);
+
+module.exports = Thought;
